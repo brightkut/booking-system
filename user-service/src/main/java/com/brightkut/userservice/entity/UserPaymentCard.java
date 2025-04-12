@@ -2,12 +2,14 @@ package com.brightkut.userservice.entity;
 
 import com.brightkut.commonlib.lib.db.BaseEntity;
 import com.brightkut.commonlib.lib.uuid.UuidV7Id;
-import com.brightkut.userservice.enums.RoleEnum;
+import com.brightkut.userservice.enums.CardTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,11 +24,19 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-public class UserRole extends BaseEntity {
+public class UserPaymentCard extends BaseEntity {
     @Id
     @UuidV7Id
-    private UUID userRoleId;
-    @Column(nullable = false)
+    private UUID userPaymentCardId;
+    @Column(length = 20, nullable = false)
+    private String cardHolderName;
+    @Column(length = 16, nullable = false)
+    private String cardNumber;
     @Enumerated(EnumType.STRING)
-    private RoleEnum roleName = RoleEnum.NORMAL_USER;
+    private CardTypeEnum cardType;
+
+
+    @ManyToOne
+    @JoinColumn(name = "user_auth_id")
+    private UserAuth userAuth;
 }
