@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=bookingSystem'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USERNAME=postgres'
+    volumes:
+      - ./db-docker-data:/var/lib/postgresql/data
+      - ./create-db.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    ports:
+      - '5432:5432'
+
+  redis:
+    container_name: 'booking-system-redis'
+    hostname: redis
+    image: 'redis'
+    volumes:
+      - $PWD/redis/data:/data
+    ports:
+      - '6380:6379'
