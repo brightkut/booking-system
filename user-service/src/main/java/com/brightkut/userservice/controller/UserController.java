@@ -19,12 +19,6 @@ public class UserController {
 
     @GetMapping
     public UserAuth getUser() {
-        UserAuth userAuth = new UserAuth();
-        userAuth.setName("aaa");
-        UserAuth userAuth2 = new UserAuth();
-        userAuth2.setName("bbb");
-        userAuthRepository.saveAll(List.of(userAuth, userAuth2));
-
         return userAuthRepository.findAll().get(0);
     }
 }

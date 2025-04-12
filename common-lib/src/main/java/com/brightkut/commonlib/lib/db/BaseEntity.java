@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 @MappedSuperclass // add this to make this is a superclass
 @EntityListeners(AuditingEntityListener.class)// Add this to allow using @CreatedDate and @LastModifiedDate
 public abstract class BaseEntity {
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
     @CreatedDate
     @Column(insertable = true, updatable = false)// set this to add this field only when the first time we insert this data
     private LocalDateTime createdAt;
@@ -29,7 +32,4 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Column(insertable = false, updatable = true)// set this to make sure the first time we insert the data the lastModifiedDate will be null
     private LocalDateTime updatedAt;
-
-    @Column(nullable = false)
-    private Boolean isDeleted = false;
 }
