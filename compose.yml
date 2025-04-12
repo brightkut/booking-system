@@ -18,4 +18,4 @@ services:
     volumes:
       - $PWD/redis/data:/data
     ports:
-      - '6380:6379'
+      - '6379:6379'
