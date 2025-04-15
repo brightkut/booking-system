@@ -1,0 +1,21 @@
+POST localhost:9000/users
+Content-Type: application/json
+
+{
+    "email": "john@email.com",
+    "password": "test",
+    "firstName": "John",
+    "lastName": "Snow",
+    "dateOfBirth" : "29/03/1997",
+    "phoneNumber": "086-123-4567"
+}
+
+###
+
+POST localhost:9000/users/roles
+Content-Type: application/json
+
+{
+  "role": "NORMAL_USER"
+}
+

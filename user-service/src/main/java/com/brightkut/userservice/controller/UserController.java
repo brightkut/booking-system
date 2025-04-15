@@ -1,28 +1,41 @@
 package com.brightkut.userservice.controller;
 
-import com.brightkut.userservice.entity.UserAuth;
+import com.brightkut.commonlib.lib.api.ApiRes;
+import com.brightkut.userservice.dto.CreateUserRoleDto;
+import com.brightkut.userservice.dto.RegisterUserDto;
 import com.brightkut.userservice.repository.UserAuthRepository;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.cache.RedisCacheManager;
+import com.brightkut.userservice.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final UserAuthRepository userAuthRepository;
-    private final RedisCacheManager redisCacheManager;
+    private final UserService userService;
 
-    public UserController(UserAuthRepository userAuthRepository, RedisCacheManager redisCacheManager) {
-        this.userAuthRepository = userAuthRepository;
-        this.redisCacheManager = redisCacheManager;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping
-    @Cacheable( value = "userToken", key = "'fix_key'")
-    public String getUser() {
-        return "test cache";
+    @PostMapping
+    public ApiRes<String> registerUser(@Valid @RequestBody RegisterUserDto registerUserDto) {
+        userService.registerUser(registerUserDto);
+
+        return ApiRes.success(HttpStatus.CREATED, "Registered user successfully");
+    }
+
+    @PostMapping("/roles")
+    public ApiRes<String> createUserRole(@Valid @RequestBody CreateUserRoleDto createUserRoleDto) {
+        userService.createUserRole(createUserRoleDto);
+
+        return ApiRes.success(HttpStatus.CREATED, "Create user role successfully");
     }
 }

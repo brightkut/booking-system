@@ -2,8 +2,10 @@ package com.brightkut.userservice.entity;
 
 import com.brightkut.commonlib.lib.db.BaseEntity;
 import com.brightkut.commonlib.lib.uuid.UuidV7Id;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -32,12 +34,14 @@ public class UserAuth extends BaseEntity {
     private String email;
     @Column(length = 64, nullable = false)
     private String passwordHash;
+    @Builder.Default
+    @Column(nullable = false)
     private Boolean isVerified = false;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_role_id")
     private UserRole userRole;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_profile_id")
     private UserProfile userProfile;
     @OneToMany(mappedBy = "userAuth")
