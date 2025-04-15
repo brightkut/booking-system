@@ -34,6 +34,8 @@ public class UserAuth extends BaseEntity {
     private String email;
     @Column(length = 64, nullable = false)
     private String passwordHash;
+    @Column(length = 64, nullable = false)
+    private String verifyToken;
     @Builder.Default
     @Column(nullable = false)
     private Boolean isVerified = false;

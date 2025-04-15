@@ -29,8 +29,24 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 10
       pool-name: ConnPool
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 587
+    username: e90f22b03dc390
+    password: 5c95f70aed9e97
+    protocol: smtp
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
 
 logging:
   level:
     com.zaxxer.hikari.HikariConfig: DEBUG
     com.zaxxer.hikari: TRACE
+
+security:
+  jwt:
+    secret-key: 295980db37e0792499daa34fc05281ea6102fc99dd8a7e971455795ff56aaab1
+    expiration: 600000 # 10 minutes
+    refresh-token:
+      expiration: 7200000 # 2 hours

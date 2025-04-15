@@ -30,10 +30,11 @@ public interface UserMapper {
 
     @Mapping(target = "email", source = "registerUserDto.email")
     @Mapping(target = "passwordHash", source = "registerUserDto.password")
+    @Mapping(target = "verifyToken", source = "verifyToken")
     @Mapping(target = "userProfile.firstName", source = "registerUserDto.firstName")
     @Mapping(target = "userProfile.lastName", source = "registerUserDto.lastName")
     @Mapping(target = "userProfile.dateOfBirth", source = "registerUserDto.dateOfBirth")
     @Mapping(target = "userProfile.phoneNumber", source = "registerUserDto.phoneNumber")
     @Mapping(target = "userRole", source = "userRole")
-    UserAuth toUserAuth(RegisterUserDto registerUserDto, UserRole userRole);
+    UserAuth toUserAuth(RegisterUserDto registerUserDto, UserRole userRole, String verifyToken);
 }
