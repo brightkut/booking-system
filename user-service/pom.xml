@@ -60,6 +60,11 @@
             <version>6.2.1</version>
         </dependency>
 
+        <!-- Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <!-- Cache -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

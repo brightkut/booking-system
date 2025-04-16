@@ -1,3 +1,15 @@
+### Create User Role
+
+POST localhost:9000/users/roles
+Content-Type: application/json
+
+{
+  "role": "NORMAL_USER"
+}
+
+
+### Register User
+
 POST localhost:9000/users
 Content-Type: application/json
 
@@ -10,12 +22,21 @@ Content-Type: application/json
     "phoneNumber": "086-123-4567"
 }
 
-###
-
-POST localhost:9000/users/roles
+### Verify Email
+POST localhost:9000/users/verify-email
 Content-Type: application/json
 
 {
-  "role": "NORMAL_USER"
+  "email": "john@email.com",
+  "token": "zljzPXki250239283258887501963edd"
+}
+
+### Login
+POST localhost:9000/users/login
+Content-Type: application/json
+
+{
+  "email": "john@email.com",
+  "password": "test"
 }
 
