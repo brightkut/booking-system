@@ -8,9 +8,11 @@ import com.brightkut.userservice.dto.RegisterUserDto;
 import com.brightkut.userservice.dto.VerifyEmailDto;
 import com.brightkut.userservice.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +36,16 @@ public class UserController {
     public ApiRes<AccessTokenDto> login(@Valid @RequestBody LoginDto loginDto) {
         var accessToken = userService.login(loginDto);
 
-        return ApiRes.success(HttpStatus.CREATED, accessToken);
+        return ApiRes.success(HttpStatus.OK, accessToken);
+    }
+
+    @PostMapping("/logout")
+    public ApiRes<String> logout(@Valid @RequestHeader(value = HttpHeaders.AUTHORIZATION) String accessToken) {
+        var authToken = accessToken.substring(7);
+
+        userService.logout(authToken);
+
+        return ApiRes.success(HttpStatus.OK, "Logout successfully");
     }
 
     @PostMapping("/roles")

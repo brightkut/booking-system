@@ -19,6 +19,7 @@ import com.brightkut.userservice.util.TokenUtil;
 
 import java.time.Duration;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,22 @@ public class UserService {
         redisTemplate.opsForValue().set(userAuth.getUserAuthId().toString(), accessToken, Duration.ofMinutes(5));
 
         return AccessTokenDto.builder().accessToken(accessToken).build();
+    }
+
+    public void logout(String authToken) {
+        Claims claim = jwtService.extractAllClaims(authToken);
+
+        var accessToken = redisTemplate.opsForValue().get(claim.getSubject());
+
+        if(accessToken == null){
+            throw new UnAuthorizeException("Error occur when user does not login yet");
+        }
+
+        if(!accessToken.equals(authToken)){
+            throw new UnAuthorizeException("Error occur when logout another session login");
+        }
+
+        redisTemplate.delete(claim.getSubject());
     }
 
     public void createUserRole(CreateUserRoleDto createUserRoleDto) {
