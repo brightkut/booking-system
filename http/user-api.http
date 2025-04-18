@@ -1,5 +1,4 @@
 ### Create User Role
-
 POST localhost:9000/users/roles
 Content-Type: application/json
 
@@ -9,12 +8,11 @@ Content-Type: application/json
 
 
 ### Register User
-
 POST localhost:9000/users
 Content-Type: application/json
 
 {
-    "email": "john@email.com",
+    "email": "john2@email.com",
     "password": "test",
     "firstName": "John",
     "lastName": "Snow",
@@ -40,3 +38,17 @@ Content-Type: application/json
   "password": "test"
 }
 
+### Verify Access Token
+POST localhost:9000/users/verify-access-token
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJTbm93IiwiZW1haWwiOiJqb2huQGVtYWlsLmNvbSIsInJlZnJlc2hUb2tlbiI6ImV5SmhiR2NpT2lKSVV6TTROQ0o5LmV5Sm1hWEp6ZEU1aGJXVWlPaUpLYjJodUlpd2liR0Z6ZEU1aGJXVWlPaUpUYm05M0lpd2laVzFoYVd3aU9pSnFiMmh1UUdWdFlXbHNMbU52YlNJc0luTjFZaUk2SW1wdmFHNUFaVzFoYVd3dVkyOXRJaXdpYVdGMElqb3hOelExTURFek16YzNMQ0psZUhBaU9qRTNORFV3TWpBMU56ZDkuSGxCZ1MydWRRcEl0QTNFMG1IZ2pqbHVnVS1pVmNLUlBnVTE4dWEzRDVlNnFFOWFqTXN3bWtSaXhVMjZTUmdqOSIsInN1YiI6ImpvaG5AZW1haWwuY29tIiwiaWF0IjoxNzQ1MDEzMzc3LCJleHAiOjE3NDUwMTM2Nzd9.Ha1UU0A1qhC9QCsF5L0eTxyKMmiWXBbD1WTGrH2obzVEaSp9egTp1_B58h2VPdBW
+
+### Logout
+POST localhost:9000/users/logout
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJTbm93IiwiZW1haWwiOiJqb2huQGVtYWlsLmNvbSIsInJlZnJlc2hUb2tlbiI6ImV5SmhiR2NpT2lKSVV6TTROQ0o5LmV5Sm1hWEp6ZEU1aGJXVWlPaUpLYjJodUlpd2liR0Z6ZEU1aGJXVWlPaUpUYm05M0lpd2laVzFoYVd3aU9pSnFiMmh1UUdWdFlXbHNMbU52YlNJc0luTjFZaUk2SW1wdmFHNUFaVzFoYVd3dVkyOXRJaXdpYVdGMElqb3hOelExTURFek1UTXhMQ0psZUhBaU9qRTNORFV3TWpBek16RjkuWGdrS3VPSS1tUG1nQXhoMWJXeGxBYnExTlZtS0MtZDJDc3FmSVpEbTRMWldsaWw0T1FnaXM5V2JDMHptd3ktUiIsInN1YiI6ImpvaG5AZW1haWwuY29tIiwiaWF0IjoxNzQ1MDEzMTMxLCJleHAiOjE3NDUwMTM0MzF9.BZoWfyDKHHiAJ3p1nbfxKUMBazNiyOU8SAqdJgEI99M17Xa4pSpzS7ANNRQ481Z4
+
+### Refresh Token
+POST localhost:9000/users/refresh-token
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJmaXJzdE5hbWUiOiJKb2huIiwibGFzdE5hbWUiOiJTbm93IiwiZW1haWwiOiJqb2huQGVtYWlsLmNvbSIsInJlZnJlc2hUb2tlbiI6ImV5SmhiR2NpT2lKSVV6TTROQ0o5LmV5Sm1hWEp6ZEU1aGJXVWlPaUpLYjJodUlpd2liR0Z6ZEU1aGJXVWlPaUpUYm05M0lpd2laVzFoYVd3aU9pSnFiMmh1UUdWdFlXbHNMbU52YlNJc0luTjFZaUk2SW1wdmFHNUFaVzFoYVd3dVkyOXRJaXdpYVdGMElqb3hOelExTURFek16YzNMQ0psZUhBaU9qRTNORFV3TWpBMU56ZDkuSGxCZ1MydWRRcEl0QTNFMG1IZ2pqbHVnVS1pVmNLUlBnVTE4dWEzRDVlNnFFOWFqTXN3bWtSaXhVMjZTUmdqOSIsInN1YiI6ImpvaG5AZW1haWwuY29tIiwiaWF0IjoxNzQ1MDEzMzc3LCJleHAiOjE3NDUwMTM2Nzd9.Ha1UU0A1qhC9QCsF5L0eTxyKMmiWXBbD1WTGrH2obzVEaSp9egTp1_B58h2VPdBW
