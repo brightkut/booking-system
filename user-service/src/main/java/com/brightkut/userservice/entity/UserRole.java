@@ -26,6 +26,7 @@ public class UserRole extends BaseEntity {
     @Id
     @UuidV7Id
     private UUID userRoleId;
+    @Builder.Default
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleEnum roleName = RoleEnum.NORMAL_USER;

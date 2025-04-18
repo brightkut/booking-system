@@ -49,6 +49,6 @@ logging:
 security:
   jwt:
     secret-key: 295980db37e0792499daa34fc05281ea6102fc99dd8a7e971455795ff56aaab1
-    expiration: 300000 # 10 minutes
+    expiration: 300000 # 5 minutes
     refresh-token:
       expiration: 7200000 # 2 hours

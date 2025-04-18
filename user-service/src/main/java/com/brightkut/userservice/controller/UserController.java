@@ -7,6 +7,7 @@ import com.brightkut.userservice.dto.LoginDto;
 import com.brightkut.userservice.dto.RegisterUserDto;
 import com.brightkut.userservice.dto.VerifyEmailDto;
 import com.brightkut.userservice.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,22 @@ public class UserController {
         userService.logout(authToken);
 
         return ApiRes.success(HttpStatus.OK, "Logout successfully");
+    }
+
+    @PostMapping("/verify-access-token")
+    public ApiRes<String> verifyAccessToken(@Valid @RequestHeader(value = HttpHeaders.AUTHORIZATION) String accessToken) {
+        var authToken = accessToken.substring(7);
+
+        userService.verifyAccessToken(authToken);
+
+        return ApiRes.success(HttpStatus.OK, "Verify access token successfully");
+    }
+
+    @PostMapping("/refresh-token")
+    public ApiRes<AccessTokenDto> refreshToken(@Valid @RequestHeader(value = HttpHeaders.AUTHORIZATION) String accessToken) throws JsonProcessingException {
+        var authToken = accessToken.substring(7);
+
+        return ApiRes.success(HttpStatus.OK, userService.refreshToken(authToken));
     }
 
     @PostMapping("/roles")

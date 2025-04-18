@@ -1,5 +1,4 @@
-
-package com.brightkut.userservice.dto;
+package com.brightkut.userservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AccessTokenDto {
-    private String accessToken;
+public class UserData {
+    private String firstName;
+    private String lastName;
+    private String email;
     private String refreshToken;
 }

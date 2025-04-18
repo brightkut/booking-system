@@ -13,12 +13,16 @@ import com.brightkut.userservice.entity.UserAuth;
 import com.brightkut.userservice.entity.UserRole;
 import com.brightkut.userservice.enums.RoleEnum;
 import com.brightkut.userservice.mapper.UserMapper;
+import com.brightkut.userservice.model.UserData;
 import com.brightkut.userservice.repository.UserAuthRepository;
 import com.brightkut.userservice.repository.UserRoleRepository;
 import com.brightkut.userservice.util.TokenUtil;
 
 import java.time.Duration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,11 +38,12 @@ public class UserService {
     private final StringRedisTemplate redisTemplate;
     private final UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
 
     public UserService(EmailService emailService, JwtService jwtService, UserAuthRepository userAuthRepository,
-            StringRedisTemplate redisTemplate,
-            UserRoleRepository userRoleRepository,
-            UserMapper userMapper, PasswordEncoder passwordEncoder) {
+                       StringRedisTemplate redisTemplate,
+                       UserRoleRepository userRoleRepository,
+                       UserMapper userMapper, PasswordEncoder passwordEncoder, ObjectMapper objectMapper) {
         this.emailService = emailService;
         this.jwtService = jwtService;
         this.userAuthRepository = userAuthRepository;
@@ -46,6 +51,7 @@ public class UserService {
         this.redisTemplate = redisTemplate;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.objectMapper = objectMapper;
     }
 
     public void registerUser(RegisterUserDto registerUserDto) {
@@ -71,32 +77,79 @@ public class UserService {
     public AccessTokenDto login(LoginDto loginDto) {
         var userAuth = userAuthRepository.findByEmail(loginDto.getEmail());
 
-
         validateUserAuthIsVerified(userAuth);
 
         validatePassword(loginDto, userAuth);
 
-        var accessToken = jwtService.generateToken(userAuth);
+        var refreshToken = jwtService.generateRefreshToken(userAuth);
+        var accessToken = jwtService.generateToken(userAuth, refreshToken);
 
-        redisTemplate.opsForValue().set(userAuth.getUserAuthId().toString(), accessToken, Duration.ofMinutes(5));
+        // Set token to redis cache
+        redisTemplate.opsForValue().set("ac".concat(userAuth.getEmail()).concat(accessToken), accessToken, Duration.ofMinutes(5));
+        redisTemplate.opsForValue().set("rf".concat(userAuth.getEmail()).concat(accessToken), refreshToken, Duration.ofHours(2));
 
-        return AccessTokenDto.builder().accessToken(accessToken).build();
+        return AccessTokenDto.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
-    public void logout(String authToken) {
-        Claims claim = jwtService.extractAllClaims(authToken);
+    public void logout(String accessToken) {
+        Claims claim = jwtService.extractAllClaims(accessToken);
 
-        var accessToken = redisTemplate.opsForValue().get(claim.getSubject());
+        var email = claim.getSubject();
 
-        if(accessToken == null){
+        var redisAccessToken = redisTemplate.opsForValue().get("ac".concat(email).concat(accessToken));
+
+        if (redisAccessToken != null) {
+            redisTemplate.delete("ac".concat(email).concat(accessToken));
+        }
+
+        var redisRefreshToken = redisTemplate.opsForValue().get("rf".concat(email).concat(accessToken));
+
+        if (redisRefreshToken != null) {
+            redisTemplate.delete("rf".concat(email).concat(accessToken));
+        }
+    }
+
+    // use for verified access
+    public void verifyAccessToken(String accessToken) {
+        Claims claim = jwtService.extractAllClaims(accessToken);
+
+        var email = claim.getSubject();
+        validateToken(accessToken, userAuthRepository.findByEmail(email));
+
+        var token = redisTemplate.opsForValue().get("ac".concat(email).concat(accessToken));
+
+        if (token == null) {
             throw new UnAuthorizeException("Error occur when user does not login yet");
         }
+    }
 
-        if(!accessToken.equals(authToken)){
-            throw new UnAuthorizeException("Error occur when logout another session login");
+    public AccessTokenDto refreshToken(String accessToken) throws JsonProcessingException {
+        Claims claim = jwtService.extractAllClaims(accessToken);
+
+        String userMetadataStr = objectMapper.writeValueAsString(claim);
+
+        UserData userDataRes =objectMapper.readValue(userMetadataStr, new TypeReference<UserData>() {});
+
+        var email = claim.getSubject();
+        var userAuth = userAuthRepository.findByEmail(email);
+        validateToken(userDataRes.getRefreshToken(), userAuth);
+
+        var token = redisTemplate.opsForValue().get("rf".concat(email).concat(accessToken));
+
+        if (token == null) {
+            throw new UnAuthorizeException("Error occur when user does not login yet or refresh token is expired");
         }
+        redisTemplate.delete("ac".concat(email).concat(accessToken));
+        redisTemplate.delete("rf".concat(email).concat(accessToken));
 
-        redisTemplate.delete(claim.getSubject());
+        var refreshToken = jwtService.generateRefreshToken(userAuth);
+        var newAccessToken = jwtService.generateToken(userAuth, refreshToken);
+
+        // Set token to redis cache
+        redisTemplate.opsForValue().set("ac".concat(userAuth.getEmail()).concat(newAccessToken), newAccessToken, Duration.ofMinutes(5));
+        redisTemplate.opsForValue().set("rf".concat(userAuth.getEmail()).concat(newAccessToken), refreshToken, Duration.ofHours(2));
+
+        return AccessTokenDto.builder().accessToken(newAccessToken).refreshToken(refreshToken).build();
     }
 
     public void createUserRole(CreateUserRoleDto createUserRoleDto) {
@@ -136,9 +189,15 @@ public class UserService {
         }
     }
 
-    private void validatePassword(LoginDto loginDto, UserAuth userAuth){
+    private void validatePassword(LoginDto loginDto, UserAuth userAuth) {
         if (!passwordEncoder.matches(loginDto.getPassword(), userAuth.getPasswordHash())) {
             throw new UnAuthorizeException("Invalid email or password");
         }
+    }
+
+    private void validateToken(String token, UserAuth userAuth) {
+       if(!jwtService.isTokenValid(token, userAuth)){
+           throw new UnAuthorizeException("Invalid access or refresh token");
+       }
     }
 }
