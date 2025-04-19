@@ -1,6 +1,6 @@
 package com.brightkut.userservice.controller;
 
-import com.brightkut.commonlib.lib.api.ApiRes;
+import com.brightkut.kei.api.ApiRes;
 import com.brightkut.userservice.dto.AccessTokenDto;
 import com.brightkut.userservice.dto.CreateUserRoleDto;
 import com.brightkut.userservice.dto.LoginDto;

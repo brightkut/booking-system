@@ -1,7 +1,7 @@
 package com.brightkut.userservice.entity;
 
-import com.brightkut.commonlib.lib.db.BaseEntity;
-import com.brightkut.commonlib.lib.uuid.UuidV7Id;
+import com.brightkut.kei.db.BaseEntity;
+import com.brightkut.kei.uuid.UuidV7Id;
 import com.brightkut.userservice.enums.CardTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

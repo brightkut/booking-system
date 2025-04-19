@@ -12,7 +12,7 @@ POST localhost:9000/users
 Content-Type: application/json
 
 {
-    "email": "john2@email.com",
+    "email": "john3@email.com",
     "password": "test",
     "firstName": "John",
     "lastName": "Snow",

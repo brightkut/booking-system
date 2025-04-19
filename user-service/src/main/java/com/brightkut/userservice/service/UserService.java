@@ -1,8 +1,10 @@
 package com.brightkut.userservice.service;
 
-import com.brightkut.commonlib.lib.exception.AlreadyExistException;
-import com.brightkut.commonlib.lib.exception.BusinessException;
-import com.brightkut.commonlib.lib.exception.UnAuthorizeException;
+import com.brightkut.kei.exception.AlreadyExistException;
+import com.brightkut.kei.exception.BusinessException;
+import com.brightkut.kei.exception.UnAuthorizeException;
+import com.brightkut.kei.util.EmailUtil;
+import com.brightkut.kei.util.TokenUtil;
 import com.brightkut.userservice.dto.AccessTokenDto;
 import com.brightkut.userservice.dto.CreateUserRoleDto;
 import com.brightkut.userservice.dto.DetailEmailDto;
@@ -16,7 +18,6 @@ import com.brightkut.userservice.mapper.UserMapper;
 import com.brightkut.userservice.model.UserData;
 import com.brightkut.userservice.repository.UserAuthRepository;
 import com.brightkut.userservice.repository.UserRoleRepository;
-import com.brightkut.userservice.util.TokenUtil;
 
 import java.time.Duration;
 
@@ -31,7 +32,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    private final EmailService emailService;
     private final JwtService jwtService;
     private final UserAuthRepository userAuthRepository;
     private final UserRoleRepository userRoleRepository;
@@ -39,12 +39,12 @@ public class UserService {
     private final UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
+    private final EmailUtil emailUtil;
 
-    public UserService(EmailService emailService, JwtService jwtService, UserAuthRepository userAuthRepository,
+    public UserService(JwtService jwtService, UserAuthRepository userAuthRepository,
                        StringRedisTemplate redisTemplate,
                        UserRoleRepository userRoleRepository,
-                       UserMapper userMapper, PasswordEncoder passwordEncoder, ObjectMapper objectMapper) {
-        this.emailService = emailService;
+                       UserMapper userMapper, PasswordEncoder passwordEncoder, ObjectMapper objectMapper, EmailUtil emailUtil) {
         this.jwtService = jwtService;
         this.userAuthRepository = userAuthRepository;
         this.userRoleRepository = userRoleRepository;
@@ -52,6 +52,7 @@ public class UserService {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.objectMapper = objectMapper;
+        this.emailUtil = emailUtil;
     }
 
     public void registerUser(RegisterUserDto registerUserDto) {
@@ -59,7 +60,7 @@ public class UserService {
 
         var userRole = userRoleRepository.findByRole(RoleEnum.NORMAL_USER);
 
-        var token = TokenUtil.generateSaltToken(8);
+        var token = TokenUtil.generateSalt(8);
 
         registerUserDto.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
 
@@ -67,11 +68,11 @@ public class UserService {
 
         userAuthRepository.save(userAuth);
 
-        var emailDetail = DetailEmailDto.builder().recipient(registerUserDto.getEmail())
+        var emailDetail = EmailUtil.EmailDetail.builder().recipient(registerUserDto.getEmail())
                 .emailBody("Please use this token to verify email: ".concat(token))
                 .emailSubject("Verify Email").build();
 
-        emailService.sendSimpleMail(emailDetail);
+        emailUtil.sendSimpleMail(emailDetail);
     }
 
     public AccessTokenDto login(LoginDto loginDto) {

@@ -1,5 +1,6 @@
 package com.brightkut.userservice.service;
 
+import com.brightkut.kei.exception.UnAuthorizeException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +17,6 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.brightkut.commonlib.lib.exception.UnAuthorizeException;
 import com.brightkut.userservice.entity.UserAuth;
 
 @Service

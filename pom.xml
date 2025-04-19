@@ -12,7 +12,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>common-lib</module>
         <module>user-service</module>
     </modules>
 
