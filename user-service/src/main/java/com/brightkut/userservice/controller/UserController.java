@@ -2,9 +2,11 @@ package com.brightkut.userservice.controller;
 
 import com.brightkut.kei.api.ApiRes;
 import com.brightkut.userservice.dto.AccessTokenDto;
+import com.brightkut.userservice.dto.AddPaymentCardDto;
 import com.brightkut.userservice.dto.CreateUserRoleDto;
 import com.brightkut.userservice.dto.LoginDto;
 import com.brightkut.userservice.dto.RegisterUserDto;
+import com.brightkut.userservice.dto.UpdateUserDto;
 import com.brightkut.userservice.dto.VerifyEmailDto;
 import com.brightkut.userservice.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +34,14 @@ public class UserController {
         userService.registerUser(registerUserDto);
 
         return ApiRes.success(HttpStatus.CREATED, "Registered user successfully");
+    }
+
+    @PutMapping
+    public ApiRes<String> updateUser(@Valid @RequestHeader(value = HttpHeaders.AUTHORIZATION) String accessToken , @RequestBody UpdateUserDto updateUserDto) {
+       var authToken = accessToken.substring(7);
+       userService.updateUser(updateUserDto, authToken);
+
+       return ApiRes.success(HttpStatus.OK, "Updated user successfully");
     }
 
     @PostMapping("/login")
@@ -77,5 +88,13 @@ public class UserController {
         userService.verifyEmail(verifyEmailDto);
 
         return ApiRes.success(HttpStatus.OK, "Verify email successfully");
+    }
+
+    @PostMapping("/payments")
+    public ApiRes<String> addPaymentCard(@Valid @RequestHeader(value = HttpHeaders.AUTHORIZATION) String accessToken , @RequestBody AddPaymentCardDto addPaymentCardDto) {
+        var authToken = accessToken.substring(7);
+        userService.addPaymentCard(addPaymentCardDto , authToken);
+
+        return ApiRes.success(HttpStatus.OK, "Add payment card successfully");
     }
 }

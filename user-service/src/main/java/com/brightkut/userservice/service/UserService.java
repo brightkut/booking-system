@@ -2,19 +2,22 @@ package com.brightkut.userservice.service;
 
 import com.brightkut.kei.exception.AlreadyExistException;
 import com.brightkut.kei.exception.BusinessException;
+import com.brightkut.kei.exception.NotFoundException;
 import com.brightkut.kei.exception.UnAuthorizeException;
 import com.brightkut.kei.util.EmailUtil;
 import com.brightkut.kei.util.TokenUtil;
 import com.brightkut.userservice.dto.AccessTokenDto;
+import com.brightkut.userservice.dto.AddPaymentCardDto;
 import com.brightkut.userservice.dto.CreateUserRoleDto;
-import com.brightkut.userservice.dto.DetailEmailDto;
 import com.brightkut.userservice.dto.LoginDto;
 import com.brightkut.userservice.dto.RegisterUserDto;
+import com.brightkut.userservice.dto.UpdateUserDto;
 import com.brightkut.userservice.dto.VerifyEmailDto;
 import com.brightkut.userservice.entity.UserAuth;
 import com.brightkut.userservice.entity.UserRole;
 import com.brightkut.userservice.enums.RoleEnum;
 import com.brightkut.userservice.mapper.UserMapper;
+import com.brightkut.userservice.mapper.UserPaymentMapper;
 import com.brightkut.userservice.model.UserData;
 import com.brightkut.userservice.repository.UserAuthRepository;
 import com.brightkut.userservice.repository.UserRoleRepository;
@@ -25,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import jakarta.transaction.Transactional;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +41,7 @@ public class UserService {
     private final UserRoleRepository userRoleRepository;
     private final StringRedisTemplate redisTemplate;
     private final UserMapper userMapper;
+    private final UserPaymentMapper userPaymentMapper;
     private PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
     private final EmailUtil emailUtil;
@@ -44,12 +49,13 @@ public class UserService {
     public UserService(JwtService jwtService, UserAuthRepository userAuthRepository,
                        StringRedisTemplate redisTemplate,
                        UserRoleRepository userRoleRepository,
-                       UserMapper userMapper, PasswordEncoder passwordEncoder, ObjectMapper objectMapper, EmailUtil emailUtil) {
+                       UserMapper userMapper, UserPaymentMapper userPaymentMapper, PasswordEncoder passwordEncoder, ObjectMapper objectMapper, EmailUtil emailUtil) {
         this.jwtService = jwtService;
         this.userAuthRepository = userAuthRepository;
         this.userRoleRepository = userRoleRepository;
         this.redisTemplate = redisTemplate;
         this.userMapper = userMapper;
+        this.userPaymentMapper = userPaymentMapper;
         this.passwordEncoder = passwordEncoder;
         this.objectMapper = objectMapper;
         this.emailUtil = emailUtil;
@@ -73,6 +79,22 @@ public class UserService {
                 .emailSubject("Verify Email").build();
 
         emailUtil.sendSimpleMail(emailDetail);
+    }
+
+    public void updateUser(UpdateUserDto updateUserDto, String accessToken) {
+        Claims claim = jwtService.extractAllClaims(accessToken);
+
+        var email = claim.getSubject();
+
+        var userAuth = userAuthRepository.findByEmail(email);
+
+        if(userAuth == null){
+            throw new NotFoundException("User not found");
+        }
+
+        userMapper.updateUser(userAuth, updateUserDto);
+
+        userAuthRepository.save(userAuth);
     }
 
     public AccessTokenDto login(LoginDto loginDto) {
@@ -133,7 +155,7 @@ public class UserService {
 
         var email = claim.getSubject();
         var userAuth = userAuthRepository.findByEmail(email);
-        validateToken(userDataRes.getRefreshToken(), userAuth);
+        validateToken(accessToken, userAuth);
 
         var token = redisTemplate.opsForValue().get("rf".concat(email).concat(accessToken));
 
@@ -172,6 +194,24 @@ public class UserService {
         userAuthRepository.save(userAuth);
     }
 
+    @Transactional
+    public void addPaymentCard(AddPaymentCardDto addPaymentCardDto, String accessToken) {
+        Claims claim = jwtService.extractAllClaims(accessToken);
+
+        var email = claim.getSubject();
+
+        var userAuth = userAuthRepository.findByEmail(email);
+
+        if(userAuth == null){
+            throw new NotFoundException("User not found");
+        }
+
+        var userPaymentCard = userPaymentMapper.toUserPaymentCard(addPaymentCardDto, userAuth);
+        userAuth.getUserPaymentCards().add(userPaymentCard);
+
+        userAuthRepository.save(userAuth);
+    }
+
     private void validateEmailExists(String email) {
         if (userAuthRepository.findByEmail(email) != null) {
             throw new AlreadyExistException("This email already exists");
@@ -197,6 +237,8 @@ public class UserService {
     }
 
     private void validateToken(String token, UserAuth userAuth) {
+       this.validateUserAuthIsVerified(userAuth);
+
        if(!jwtService.isTokenValid(token, userAuth)){
            throw new UnAuthorizeException("Invalid access or refresh token");
        }

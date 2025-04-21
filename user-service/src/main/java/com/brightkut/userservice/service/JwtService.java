@@ -66,7 +66,6 @@ public class JwtService {
         extraClaims.put("firstName", userProfile.getFirstName());
         extraClaims.put("email", userDetails.getEmail());
         extraClaims.put("lastName", userProfile.getLastName());
-        extraClaims.put("refreshToken", refreshToken);
 
         return Jwts
                 .builder()

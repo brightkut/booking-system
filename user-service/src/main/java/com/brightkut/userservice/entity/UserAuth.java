@@ -34,7 +34,7 @@ public class UserAuth extends BaseEntity {
     private String email;
     @Column(length = 64, nullable = false)
     private String passwordHash;
-    @Column(length = 64, nullable = false)
+    @Column(length = 8, nullable = false)
     private String verifyToken;
     @Builder.Default
     @Column(nullable = false)
@@ -46,6 +46,6 @@ public class UserAuth extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_profile_id")
     private UserProfile userProfile;
-    @OneToMany(mappedBy = "userAuth")
+    @OneToMany(mappedBy = "userAuth", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserPaymentCard> userPaymentCards;
 }
