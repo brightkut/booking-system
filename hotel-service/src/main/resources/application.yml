@@ -31,6 +31,9 @@ logging:
     com.zaxxer.hikari.HikariConfig: DEBUG
     com.zaxxer.hikari: TRACE
 
+client:
+  user-client-url: http://localhost:9000/users
+
 kei:
   exception:
     handler:

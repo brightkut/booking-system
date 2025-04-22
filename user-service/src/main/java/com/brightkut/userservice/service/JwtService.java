@@ -98,7 +98,7 @@ public class JwtService {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (ExpiredJwtException e) {
+        } catch (Exception e) {
             throw new UnAuthorizeException("Error occur when verify jwt token");
         }
     }
