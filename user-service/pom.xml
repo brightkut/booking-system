@@ -96,7 +96,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- -->
+        <!-- Jwt -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
