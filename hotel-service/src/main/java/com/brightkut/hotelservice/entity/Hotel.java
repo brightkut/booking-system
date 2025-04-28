@@ -15,7 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,9 +38,9 @@ public class Hotel extends BaseEntity {
     @Column(nullable = false)
     private Boolean isActive = false;
     @Column(nullable = false)
-    private LocalDateTime checkedInTime;
+    private String checkedInTime;
     @Column(nullable = false)
-    private LocalDateTime checkedOutTime;
+    private String checkedOutTime;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Room> rooms;

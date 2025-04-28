@@ -40,7 +40,7 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "room_type_id")
     private RoomType roomType;
 }

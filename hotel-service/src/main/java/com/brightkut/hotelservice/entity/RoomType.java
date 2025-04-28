@@ -2,11 +2,14 @@ package com.brightkut.hotelservice.entity;
 
 import java.util.UUID;
 
+import com.brightkut.hotelservice.RoomTypeEnum;
 import com.brightkut.kei.db.BaseEntity;
 import com.brightkut.kei.uuid.UuidV7Id;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +28,8 @@ public class RoomType extends BaseEntity {
     @UuidV7Id
     private UUID roomTypeId;
     @Column(nullable = false)
-    private Long roomType;
+    @Enumerated(EnumType.STRING)
+    private RoomTypeEnum roomType;
     @Column(nullable = false)
     private String roomSize;
     @Column(nullable = false)
